@@ -12,6 +12,9 @@
 #define  DEFINED_QRKMEMUNIT
     // Define the standard unit of memory.  Note that sizeof(qrkMemUnit_t) should return 1.
     typedef  unsigned char  qrkMemUnit_t;
+
+    // Unit to use to define the size of a memory block.
+    typedef unsigned int qrkMemBlkSize_t;
 #endif
 
 // Define the block sizes and number of blocks in the pool...
@@ -33,8 +36,8 @@
     #define QRK_MPOOL_TOTAL_BLOCKS          (16+8+2)            // !!! Must match QRK_MPOOL_BLOCKS !!!
     #define QRK_MPOOL_TOTAL_USER_BYTES      (8*16+32*8+128*2)   // !!! Must match QRK_MPOOL_BLOCKS !!!
 
-    #define QRK_MPOOL_SIZEOF_BLOCK_HEADER   (16)
-    #define QRK_MPOOL_USE_HEAP_TO_INIT_POOL ( QRM_MPOOL_TOTAL_USER_BYTES + QRK_MPOOL_TOTAL_BLOCKS * QRK_MPOOL_SIZEOF_BLOCK_HEADER )
+    #define QRK_MPOOL_SIZEOF_BLOCK_HEADER   (12)
+    #define QRK_MPOOL_MEM_SIZE              ( QRK_MPOOL_TOTAL_USER_BYTES + QRK_MPOOL_TOTAL_BLOCKS * QRK_MPOOL_SIZEOF_BLOCK_HEADER )
 #endif
 
 

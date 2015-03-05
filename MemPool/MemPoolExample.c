@@ -10,9 +10,9 @@
 
 #include "MemPoolExample.h"
 
-#include "qrkMemPool/qrkMemPool_Config.h"
+#include "qrkMemPool.h"
 
 void MemPoolExample(const InfUserStream_t *userStream)
 {
-
+    qrkMemPool_Init();
 }

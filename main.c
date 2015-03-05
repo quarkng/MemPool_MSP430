@@ -68,7 +68,7 @@ void main(void) {
 }
 
 //****************************************************************************************
-void SpinUntilTxBufferIsClear( InfUserStream_t *userInterface )
+static void SpinUntilTxBufferIsClear( InfUserStream_t *userInterface )
 {
 	while( ! (*userInterface->isTxBufferClear)() ); // BUSY WAIT
 }

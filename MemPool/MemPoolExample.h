@@ -8,8 +8,6 @@
 #ifndef MEMPOOLEXAMPLE_H_
 #define MEMPOOLEXAMPLE_H_
 
-#include <stdint.h>
-#include <stdbool.h>
 #include "InfUserStream.h"
 
 void MemPoolExample(const InfUserStream_t *userStream);
