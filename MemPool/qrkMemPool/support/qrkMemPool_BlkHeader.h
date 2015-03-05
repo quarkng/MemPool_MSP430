@@ -9,17 +9,17 @@
 #define QRK_MEMPOOL_BLKHEADER_H_
 
 #include "qrkMemPool_Config.h"
+#include "qrkMemPool_OrderedLink.h"
 
 
 typedef struct
 {
-    void            *freeQueHead;  // Also used as magic number to ensure integrity
-    qrkMemBlkSize_t  size;
-    int              ref;          // Reference counter (count of users actively using this block)
-    void            *mem;          // Point to the user memory
+    qrkMemPool_OrderedLink  link;
+
+    unsigned char           freeQueIdx;   // Index to the free-Que that this block belongs to
+    int                     ref;          // Reference counter (count of users actively using this block)
 }
 qrkMemPool_BlkHeader;
-
 
 
 #endif  /* QRK_MEMPOOL_BLKHEADER_H_ */

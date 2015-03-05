@@ -20,24 +20,26 @@
 // Define the block sizes and number of blocks in the pool...
 #define QRK_MPOOL_BLOCKS    \
 {                           \
-    {    8,    16  },       \
-    {   32,     8  },       \
-    {  128,     2  },       \
+    {   16,    16  },       \
+    {   64,     8  },       \
+    {   256,    2  },       \
 }
 //... as an array of  { Bytes_per_block,  Number_of_blocks }
 
 
 // Make this non-zero to allow code to allocate space for the pool with a one-time malloc call.
-// Otherwise, you must define QRK_MPOOL_TOTAL_BLOCKS and QRK_MPOOL_TOTAL_USER_BYTES correctly.
+// Otherwise, you must define QRK_MPOOL_TOTAL_BLOCKS and QRK_MPOOL_TOTAL_USER_BYTES correctly for static allocation.
 #define QRK_MPOOL_USE_HEAP_TO_INIT_POOL     0
 
 #if QRK_MPOOL_USE_HEAP_TO_INIT_POOL == 0
     // Define the size needed for the mem pool
-    #define QRK_MPOOL_TOTAL_BLOCKS          (16+8+2)            // !!! Must match QRK_MPOOL_BLOCKS !!!
-    #define QRK_MPOOL_TOTAL_USER_BYTES      (8*16+32*8+128*2)   // !!! Must match QRK_MPOOL_BLOCKS !!!
+    #define QRK_MPOOL_COUNT_POOLS           (3)                     // !!! Must match QRK_MPOOL_BLOCKS !!!
+    #define QRK_MPOOL_TOTAL_BLOCKS          (16+8+2)                // !!! Must match QRK_MPOOL_BLOCKS !!!
+    #define QRK_MPOOL_TOTAL_USER_BYTES      (16*16 + 64*8 + 256*2)  // !!! Must match QRK_MPOOL_BLOCKS !!!
 
     #define QRK_MPOOL_SIZEOF_BLOCK_HEADER   (12)
-    #define QRK_MPOOL_MEM_SIZE              ( QRK_MPOOL_TOTAL_USER_BYTES + QRK_MPOOL_TOTAL_BLOCKS * QRK_MPOOL_SIZEOF_BLOCK_HEADER )
+    #define QRK_MPOOL_SIZEOF_QUE_STRUCT     (10)
+    #define QRK_MPOOL_MEM_SIZE              ( QRK_MPOOL_TOTAL_USER_BYTES + QRK_MPOOL_TOTAL_BLOCKS * QRK_MPOOL_SIZEOF_BLOCK_HEADER + QRK_MPOOL_COUNT_POOLS * QRK_MPOOL_SIZEOF_QUE_STRUCT )
 #endif
 
 
