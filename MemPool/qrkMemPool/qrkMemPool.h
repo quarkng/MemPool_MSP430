@@ -18,4 +18,7 @@ void* qrkMemPool_Alloc(qrkMemBlkSize_t size);
 
 int   qrkMemPool_Free( void *mem );
 
+
+qrkMemBlkSize_t  qrkMemPool_GetBlockSize( void *mem );
+
 #endif  /* QRK_MEMPOOL_H_ */

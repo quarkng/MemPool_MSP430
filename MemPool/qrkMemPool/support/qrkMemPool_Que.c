@@ -19,12 +19,57 @@ void qrkMemPool_QueInit( qrkMemPool_Que *q, qrkMemBlkSize_t blkSizeInit )
 
 void qrkMemPool_Enque( qrkMemPool_Que *q, qrkMemPool_OrderedLink *item )
 {
+    qrkMemPool_OrderedLink *prevTail;
 
+    __QRK_CRITICAL_SECTION_BEGIN__
+
+    prevTail = q->tail;
+    q->tail = item;
+
+    item->next = NULL;
+    item->prev = prevTail;
+
+    q->tail = item;
+    if( prevTail == NULL )
+    {
+        q->head = item;
+    }
+    else
+    {
+        prevTail->next = item;
+    }
+
+    __QRK_CRITICAL_SECTION_END__
 }
 
 qrkMemPool_OrderedLink * qrkMemPool_Deque(qrkMemPool_Que *q)
 {
+    qrkMemPool_OrderedLink *item = NULL;
 
-    return NULL;
+    __QRK_CRITICAL_SECTION_BEGIN__
+
+    if( q-> head != NULL )
+    {
+        item = q->head;
+        q->head = item->next;
+
+        if( q->head != NULL )
+        {
+            q->head->prev = NULL;
+        }
+        else
+        {   // que is empty
+            q->tail = NULL;
+        }
+    }
+
+    __QRK_CRITICAL_SECTION_END__
+
+    if( item != NULL )
+    {
+        item->next = item->prev = NULL;
+    }
+
+    return item;
 }
 

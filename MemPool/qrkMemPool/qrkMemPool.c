@@ -107,17 +107,66 @@ static int InitBlocksToQue( qrkMemUnit_t *mem, int queIndex )
 
 void* qrkMemPool_Alloc(qrkMemBlkSize_t size)
 {
+    void* mem = NULL;
+    int i;
 
-    return NULL;
+    for( i = 0; i < countPools; i++ )
+    {
+        if( size <= mpBlockSizes[i][0] )
+        {
+            qrkMemPool_BlkHeader *bh;
+            bh = (qrkMemPool_BlkHeader *) qrkMemPool_Deque(&poolQues[i]);
+            if( bh != NULL )
+            {
+                bh->ref++;
+                mem = (void*) &bh[1];
+                break;
+            }
+        }
+    }
+
+    return mem;
 }
 
 
 
 int  qrkMemPool_Free( void *mem )
 {
+    qrkMemPool_BlkHeader *bh;
+
+    if( mem == NULL )
+    {   // Ignore if null was passed in
+        return 1;
+    }
+
+    bh = (qrkMemPool_BlkHeader*) mem;
+    bh--; // now points to the block header
+
+    bh->ref--;
+
+    if( bh->ref == 0 )
+    {
+        qrkMemPool_Enque( &poolQues[bh->freeQueIdx], &bh->link );
+    }
+
     return 0;
 }
 
+
+qrkMemBlkSize_t  qrkMemPool_GetBlockSize( void *mem )
+{
+    qrkMemPool_BlkHeader *bh;
+
+    if( mem == NULL )
+    {   // Ignore if null was passed in
+        return 0;
+    }
+
+    bh = (qrkMemPool_BlkHeader*) mem;
+    bh--; // now points to the block header
+
+    return poolQues[ bh->freeQueIdx ].blkSize;
+}
 
 //==================================================
 static void validateConfigValues( void )

@@ -44,17 +44,23 @@
 
 
 
-#ifndef QRK_CRITICAL_SECTION_BEGIN
+#ifndef __QRK_CRITICAL_SECTION_BEGIN__
     // Define macros for the Mem Pool code to enable/disable one level of interrupts.
     // Check your compiler manual for intrinsic functions.
-    #define QRK_CRITICAL_SECTION_BEGIN                              \
+    #define __QRK_CRITICAL_SECTION_BEGIN__                          \
         {                                                           \
-            unsigned short istate = __get_interrupt_state(void);    \
-            __disable_interrupts();
+            unsigned short istate = __get_interrupt_state();        \
+            __disable_interrupt();
 
-    #define QRK_CRITICAL_SECTION_END            \
+    #define __QRK_CRITICAL_SECTION_END__        \
             __set_interrupt_state(istate);      \
         }
+
+    // Place any #include neccessary to use the intrisic functions here.
+    #include "intrinsics.h"
 #endif
+
+
+
 
 #endif /* QRK_MEMPOOL_CONFIG_H_ */
