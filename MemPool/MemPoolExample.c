@@ -30,14 +30,13 @@ void MemPoolExample(const InfUserStream_t *userStream)
 
         for( i=0; i < totalBlocks; i++ )
         {
-            m[i] = NULL;
-
-            while( m[i] == NULL )
+            do
             {
                 m[i] = qrkMemPool_Alloc(8);
             }
+            while( m[i] == NULL );
 
-            Fill( (i*k) ^ 0x5A, m[i] ); // Fill it up with value
+            Fill( (i*(k+1)) ^ 0x5A, m[i] ); // Fill it up with value
         }
 
         __no_operation(); // A place for breakpoint;

@@ -155,7 +155,10 @@ int  qrkMemPool_Free( void *mem )
 
 qrkMemBlkSize_t  qrkMemPool_GetBlockSize( void *mem )
 {
+    int i;
     qrkMemPool_BlkHeader *bh;
+    qrkMemBlkSize_t size;
+    qrkMemBlkSize_t sizeRaw;
 
     if( mem == NULL )
     {   // Ignore if null was passed in
@@ -165,7 +168,22 @@ qrkMemBlkSize_t  qrkMemPool_GetBlockSize( void *mem )
     bh = (qrkMemPool_BlkHeader*) mem;
     bh--; // now points to the block header
 
-    return poolQues[ bh->freeQueIdx ].blkSize;
+
+    sizeRaw = poolQues[ bh->freeQueIdx ].blkSize;
+
+    // Make sure value is one of the valid sizes.
+    // Otherwise, zero is returned.
+    size = 0;
+    for( i = 0; i < countPools; i++ )
+    {
+        if( sizeRaw == mpBlockSizes[i][0] )
+        {
+            size = sizeRaw;
+            break;
+        }
+    }
+
+    return size;
 }
 
 //==================================================
