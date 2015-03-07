@@ -4,35 +4,33 @@
  *  Created on: Mar 5, 2015
  *      Author: Quark
  */
-
 #include <stddef.h>
 #include <stdlib.h>
 
 #include "qrkMemPool.h"
-
 #include "qrkMemPool_Config.h"
+
+#include "support/qrkCommonMacro.h"
 #include "support/qrkMemPool_BlkHeader.h"
 #include "support/qrkMemPool_Que.h"
 
-
+//==================================================
 #if QRK_MPOOL_USE_HEAP_TO_INIT_POOL == 0
 static qrkMemUnit_t poolMem[QRK_MPOOL_MEM_SIZE];
 #else
 static qrkMemUnit_t *poolMem = NULL;
 #endif
 
-
-
-static const qrkMemBlkSize_t mpBlockSizes[][2] = QRK_MPOOL_BLOCKS;
+static const qrkMemBlkSize_t mpBlockSizes[][2] = QRK_MPOOL_BLOCKS;  // Defines size-of-block and number-of-blocks in each pool
 static const int countPools = sizeof(mpBlockSizes) / sizeof(mpBlockSizes[0]);
 
 static int totalBlocks = 0;
 static int totalUserBytes = 0;
 static int mpoolMemSize = 0;
 
-static qrkMemPool_Que *poolQues;
+static qrkMemPool_Que *poolQues; // Each que represents a pool.
 //==================================================
-
+// Static function prototypes
 
 static void validateConfigValues( void );
 static int InitBlocksToQue( qrkMemUnit_t *mem, int queIndex );
@@ -56,6 +54,7 @@ void qrkMemPool_Init( void )
 
 #if QRK_MPOOL_USE_HEAP_TO_INIT_POOL != 0
     if( poolMem == NULL) {  poolMem = (qrkMemUnit_t*) malloc( mpoolMemSize );  }
+    qrk_ASSERT( poolMem != NULL );
 #endif
 
     // Now build the pool ques
@@ -69,10 +68,7 @@ void qrkMemPool_Init( void )
     }
 
     totalUsed = pm - poolMem;
-    if( totalUsed != mpoolMemSize )
-    {
-        for(;;); // under/over allocated memory
-    }
+    qrk_ASSERT(totalUsed == mpoolMemSize);  // test under/over allocated memory
 }
 
 // Returns number of qrkMemUnit_t used
@@ -138,6 +134,10 @@ int  qrkMemPool_Free( void *mem )
     {   // Ignore if null was passed in
         return 1;
     }
+    if( (mem < poolMem) || (mem >= &(poolMem[mpoolMemSize]) ) )
+    {   // Memory does not belong in memory pool!
+        return 2;
+    }
 
     bh = (qrkMemPool_BlkHeader*) mem;
     bh--; // now points to the block header
@@ -190,31 +190,17 @@ qrkMemBlkSize_t  qrkMemPool_GetBlockSize( void *mem )
 static void validateConfigValues( void )
 {
 #if QRK_MPOOL_USE_HEAP_TO_INIT_POOL == 0
-    if( totalBlocks != QRK_MPOOL_TOTAL_BLOCKS )
-    {
-        for(;;);    // Trap here if QRK_MPOOL_TOTAL_BLOCKS is defined wrong.
-    }
 
-    if( totalUserBytes != QRK_MPOOL_TOTAL_USER_BYTES )
-    {
-        for(;;);    // Trap here if QRK_MPOOL_TOTAL_USER_BYTES is defined wrong.
-    }
+    qrk_ASSERT( totalBlocks == QRK_MPOOL_TOTAL_BLOCKS );    // Trap here if QRK_MPOOL_TOTAL_BLOCKS is defined wrong.
 
-    if( sizeof(qrkMemPool_BlkHeader) != QRK_MPOOL_SIZEOF_BLOCK_HEADER )
-    {
-        for(;;);    // Trap here if QRK_MPOOL_SIZEOF_BLOCK_HEADER is defined wrong.
-    }
-    if( sizeof(qrkMemPool_Que) != QRK_MPOOL_SIZEOF_QUE_STRUCT )
-    {
-        for(;;);    // Trap here if QRK_MPOOL_SIZEOF_QUE_STRUCT is defined wrong.
-    }
-    if( countPools != QRK_MPOOL_COUNT_POOLS )
-    {
-        for(;;);    // Trap here if QRK_MPOOL_COUNT_POOLS is defined wrong.
-    }
-    if( mpoolMemSize != QRK_MPOOL_MEM_SIZE )
-    {
-        for(;;);    // This should never happen.  Bad bug.
-    }
+    qrk_ASSERT( totalUserBytes == QRK_MPOOL_TOTAL_USER_BYTES );  // Trap here if QRK_MPOOL_TOTAL_USER_BYTES is defined wrong.
+
+    qrk_ASSERT( sizeof(qrkMemPool_BlkHeader) == QRK_MPOOL_SIZEOF_BLOCK_HEADER ); // Trap here if QRK_MPOOL_SIZEOF_BLOCK_HEADER is defined wrong.
+
+    qrk_ASSERT( sizeof(qrkMemPool_Que) == QRK_MPOOL_SIZEOF_QUE_STRUCT );    // Trap here if QRK_MPOOL_SIZEOF_QUE_STRUCT is defined wrong.
+
+    qrk_ASSERT( countPools == QRK_MPOOL_COUNT_POOLS );  // Trap here if QRK_MPOOL_COUNT_POOLS is defined wrong.
+
+    qrk_ASSERT( mpoolMemSize == QRK_MPOOL_MEM_SIZE ); // This should never happen.  Bad bug.
 #endif
 }
